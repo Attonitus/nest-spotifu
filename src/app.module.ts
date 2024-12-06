@@ -3,6 +3,9 @@ import { SongsModule } from './songs/songs.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Song } from './songs/entities/song.entity';
+import { CommonModule } from './common/common.module';
+import { FilesModule } from './files/files.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 
 @Module({
@@ -19,6 +22,9 @@ import { Song } from './songs/entities/song.entity';
       synchronize: true,
     }),
     SongsModule,
+    CommonModule,
+    FilesModule,
+    CloudinaryModule,
   ],
   controllers: [],
   providers: [],

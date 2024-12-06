@@ -1,5 +1,6 @@
 import { IsIn, IsPositive, IsString } from "class-validator";
 
+export const VALID_GENRES = ["pop", "metal", "rock", "reggaeton", "hiphop", "rap", "indie", "classical"];
 
 export class CreateSongDto {
 
@@ -17,7 +18,7 @@ export class CreateSongDto {
     imageUrl: string;
 
     @IsString()
-    @IsIn(["pop", "metal", "rock", "reggaeton", "hiphop", "rap", "indie"])
+    @IsIn(VALID_GENRES)
     genre: string;
 
 
