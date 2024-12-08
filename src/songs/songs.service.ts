@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dto/paginationDto';
 import { validateUUID } from 'src/adapters/uuid.adapter';
 import { FilesService } from 'src/files/files.service';
+import { Artist } from 'src/auth/entities/artist.entity';
 
 
 @Injectable()
@@ -19,7 +20,8 @@ export class SongsService {
     private readonly fileService: FilesService,
   ){}
 
-  async create(createSongDto: CreateSongDto, imageFile: Express.Multer.File, songFile: Express.Multer.File) {
+  async create(createSongDto: CreateSongDto, 
+    imageFile: Express.Multer.File, songFile: Express.Multer.File, artist: Artist) {
 
     const imageUpload  = await this.fileService.upload(imageFile);
     const songUpload  = await this.fileService.upload(songFile, "video");
@@ -33,7 +35,8 @@ export class SongsService {
         songAudio: {
           public_id: songUpload.public_id.split('/')[1],
           url: songUpload.url
-        }
+        },
+        artist
       });
 
       if(!song) throw new BadRequestException(`Error creating song`);
@@ -84,10 +87,13 @@ export class SongsService {
   }
 
   async update(id: string, updateSongDto: UpdateSongDto, 
-    imageFile: Express.Multer.File, songFile: Express.Multer.File) {
+    imageFile: Express.Multer.File, songFile: Express.Multer.File, artist: Artist) {
 
       const song = await this.findOne(id);
       if(!song) throw new BadRequestException(`Song with ${id} not exist`);
+
+      if(song.artist.id !== artist.id)
+        throw new BadRequestException(`${artist.name} cant update a ${song.artist.name}'song`);
 
       // Copy all values of updateDTO to song
       Object.assign(song, updateSongDto);
@@ -120,8 +126,12 @@ export class SongsService {
       return song;
   }
 
-  async remove(id: string) {
-    const {songAudio, songImage} = await this.findOne(id);
+  async remove(id: string, artist: Artist) {
+    const song = await this.findOne(id);
+    const {songAudio, songImage} = song;
+
+    if(song.artist.id !== artist.id)
+      throw new BadRequestException(`${artist.name} can't delete a ${song.artist.name}'song`);
 
     if(!songAudio || !songImage){
       throw new BadRequestException(`Song with ${id} dont have audio or image`);

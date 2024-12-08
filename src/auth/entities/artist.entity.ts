@@ -1,4 +1,5 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Song } from "src/songs/entities/song.entity";
+import { BeforeInsert, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Artist {
@@ -31,6 +32,12 @@ export class Artist {
         default: ['user']
     })
     roles: string[];
+
+    @OneToMany(
+        () => Song,
+        (song) => song.artist
+    )
+    song: Song[];
 
     @BeforeInsert()
     lowcaseEmail() {

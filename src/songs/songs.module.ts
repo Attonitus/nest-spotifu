@@ -7,9 +7,11 @@ import { SongImage } from './entities/song-image.entity';
 import { FilesModule } from 'src/files/files.module';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { SongAudio } from './entities/song-audio.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Song, SongImage, SongAudio]), FilesModule, CloudinaryModule],
+  imports: [TypeOrmModule.forFeature([Song, SongImage, SongAudio]),
+  FilesModule, CloudinaryModule, AuthModule],
   controllers: [SongsController],
   providers: [SongsService],
 })

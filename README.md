@@ -6,6 +6,7 @@
 
 Search and listen your favorite song!
 Web application with JWT Authentication and connection with DB using TypeORM. An artist can CRUD songs.
+Endpoints have role authentication, if user dont have a specified role dont allowed to pass.
 Public users can search for song and play.
 What are you waiting for join us?
 

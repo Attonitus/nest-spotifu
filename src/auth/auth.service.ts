@@ -79,6 +79,16 @@ export class AuthService {
         return token;
     }
 
+    async checkAuth(artist: Artist){
+        return {
+            artist: {
+                id: artist.id,
+                email: artist.email,
+            },
+            token: this.getJWTToken({id: artist.id})
+        }
+    }
+
     private handleDBErrors = (error: any) => {
         if(error.code === "23505"){
             throw new BadRequestException(`Error: ${error.detail}`);

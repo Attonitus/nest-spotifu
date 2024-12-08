@@ -5,22 +5,28 @@ import { UpdateSongDto } from './dto/update-song.dto';
 import { PaginationDto } from 'src/common/dto/paginationDto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { fileExtensionFilter } from 'src/files/helpers/fileExtensionFilter.helper';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { ValidRoles } from 'src/auth/interfaces/valid-roles.interface';
+import { GetArtist } from 'src/auth/decorators/get-artist.decorator';
+import { Artist } from 'src/auth/entities/artist.entity';
 
 @Controller('songs')
 export class SongsController {
   constructor(private readonly songsService: SongsService) {}
 
   @Post()
+  @Auth(ValidRoles.user)
   @UseInterceptors(
     FileFieldsInterceptor([
     {name: 'imageFile', maxCount: 1},
     {name: 'songFile', maxCount: 1},
   ], { fileFilter: fileExtensionFilter }))
-  create(@Body() createSongDto: CreateSongDto, 
+  create(@Body() createSongDto: CreateSongDto,
+  @GetArtist() artist: Artist,
   @UploadedFiles() files: {imageFile?: Express.Multer.File, songFile?: Express.Multer.File}) {
     const {imageFile, songFile} = files;
     if(!imageFile || !songFile) throw new BadRequestException(`image and song are required`);
-    return this.songsService.create(createSongDto, imageFile[0], songFile[0]);
+    return this.songsService.create(createSongDto, imageFile[0], songFile[0], artist);
   }
 
   @Get()
@@ -39,19 +45,22 @@ export class SongsController {
   }
 
   @Patch(':id')
+  @Auth(ValidRoles.user)
   @UseInterceptors(FileFieldsInterceptor([
     {name: 'imageFile', maxCount: 1},
     {name: 'songFile', maxCount: 1},
   ], { fileFilter: fileExtensionFilter }))
   update(@Param('id', ParseUUIDPipe) id: string, 
   @Body() updateSongDto: UpdateSongDto,
+  @GetArtist() artist: Artist,
   @UploadedFiles() files: {imageFile?: Express.Multer.File, songFile?: Express.Multer.File}) {
     const {imageFile = [], songFile = []} = files;
-    return this.songsService.update(id, updateSongDto, imageFile[0], songFile[0]);
+    return this.songsService.update(id, updateSongDto, imageFile[0], songFile[0], artist);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.songsService.remove(id);
+  @Auth(ValidRoles.user)
+  remove(@Param('id', ParseUUIDPipe) id: string, @GetArtist() artist: Artist) {
+    return this.songsService.remove(id, artist);
   }
 }

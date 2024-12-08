@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { SongImage } from "./song-image.entity";
 import { SongAudio } from "./song-audio.entity";
+import { Artist } from "src/auth/entities/artist.entity";
 
 @Entity()
 export class Song {
@@ -33,4 +34,10 @@ export class Song {
     @Column('text')
     genre: string;
 
+    @ManyToOne(
+        () => Artist,
+        (artist) => artist.song,
+        {eager: true}
+    )
+    artist: Artist;
 }
