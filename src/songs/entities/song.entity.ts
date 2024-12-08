@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { SongImage } from "./song-image.entity";
+import { SongAudio } from "./song-audio.entity";
 
 @Entity()
 export class Song {
@@ -6,8 +8,13 @@ export class Song {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column('text')
-    songUrl: string;
+    @OneToOne(
+        () => SongAudio,
+        (songAudio) => songAudio.song,
+        {cascade: true, eager: true} 
+    )
+    @JoinColumn()
+    songAudio: SongAudio;
 
     @Column('text')
     title: string;
@@ -15,8 +22,13 @@ export class Song {
     @Column('numeric')
     year: number;
 
-    @Column('text')
-    imageUrl: string;
+    @OneToOne(
+        () => SongImage,
+        (songImage) => songImage.song,
+        {cascade: true, eager: true} 
+    )
+    @JoinColumn()
+    songImage: SongImage;
 
     @Column('text')
     genre: string;

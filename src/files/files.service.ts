@@ -9,8 +9,8 @@ export class FilesService {
     private readonly cloudinaryService: CloudinaryService
   ){}
 
-  async upload(file: Express.Multer.File) {
-    const res = await this.cloudinaryService.uploadFile(file);
+  async upload(file: Express.Multer.File, resource_type: "image" | "video" = "image") {
+    const res = await this.cloudinaryService.uploadFile(file, resource_type);
     if(!res.secure_url){
       throw new ConflictException(`Error uploading file`);
     }
@@ -20,8 +20,8 @@ export class FilesService {
     };
   }
 
-  async remove(id: string) {
-    const res = await this.cloudinaryService.deleteFile(id);
+  async remove(id: string, resource_type: 'image' | 'video' = 'image') {
+    const res = await this.cloudinaryService.deleteFile(id, resource_type);
     if(res.result === "not found"){
       throw new BadRequestException(`File with ID ${id} not exist`);
     }

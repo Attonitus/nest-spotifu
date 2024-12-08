@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { v2 as cloudinary, DeleteApiResponse, UploadApiErrorResponse, UploadApiResponse } from 'cloudinary'
+import { v2 as cloudinary, UploadApiErrorResponse, UploadApiResponse } from 'cloudinary'
 import {} from 'node:buffer'
 import { Readable } from 'node:stream';
 
@@ -17,10 +17,13 @@ export class CloudinaryService {
     })
   }
 
-  async uploadFile(file: Express.Multer.File): 
+  async uploadFile(file: Express.Multer.File, resource_type: 'image' | 'video' = 'image'): 
   Promise<UploadApiResponse | UploadApiErrorResponse> {
     return new Promise((resolve, reject) => {
-      const upload = cloudinary.uploader.upload_stream({folder: this.configService.get("FOLDER")},
+      const upload = cloudinary.uploader.upload_stream({
+        folder: this.configService.get("FOLDER"),
+        resource_type
+      },
       (error, result) => {
         if(error) return reject(error);
         resolve(result);
@@ -30,9 +33,9 @@ export class CloudinaryService {
     })
   }
 
-  async deleteFile(id: string): Promise<any> {
+  async deleteFile(id: string, resource_type: 'image' | 'video' = 'image'): Promise<any> {
     return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(`${this.configService.get("FOLDER")}/${id}`)
+      cloudinary.uploader.destroy(`${this.configService.get("FOLDER")}/${id}`, {resource_type})
       .then((res) => resolve(res))
       .catch(error => reject(error))
     })
