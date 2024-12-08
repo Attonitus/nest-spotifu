@@ -5,6 +5,8 @@ import { Artist } from './entities/artist.entity';
 import { Repository } from 'typeorm';
 import { hashPassword, validatePassword } from 'src/adapters/bcrypt.adapter';
 import { LoginArtistDto } from './dto/login-artist.dto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 
 @Injectable()
@@ -12,7 +14,9 @@ export class AuthService {
 
     constructor(
         @InjectRepository(Artist)
-        private readonly artistRepository: Repository<Artist>
+        private readonly artistRepository: Repository<Artist>,
+
+        private readonly jwtService: JwtService
     ){}
 
     async register(createArtistDto: CreateArtistDto){
@@ -34,7 +38,7 @@ export class AuthService {
                     name: artist.name,
                     email: artist.email
                 },
-                token: "ABC"
+                token: this.getJWTToken({id: artist.id})
             };
 
         } catch (error) {
@@ -65,8 +69,14 @@ export class AuthService {
                 id: artist.id,
                 email: artist.email,
             },
-            token: "ABC"
+            token: this.getJWTToken({id: artist.id})
         }
+    }
+
+    private getJWTToken(payload: JwtPayload){
+
+        const token = this.jwtService.sign(payload);
+        return token;
     }
 
     private handleDBErrors = (error: any) => {
